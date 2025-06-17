@@ -92,7 +92,7 @@ client.on('message', async (topic, message) => {
                 // Filter the MQTT data array to find items that match this device.
                 // A match occurs if the MQTT item's 'name' property includes the device's API 'name'.
                 const filteredMqttDataForDevice = mqttDataArray.filter(mqttItem =>
-                    mqttItem.name && mqttItem.name.includes(deviceNameFromApi)
+                    mqttItem.server_name === deviceNameFromApi
                 );
 
                 // If matching data is found for this device, process it.
@@ -115,8 +115,6 @@ client.on('message', async (topic, message) => {
                         } else if (item.name && item.name.includes('Totalizer')) {
                             payloadForDb.totalizer = parseFloat(item.data);
                         } else if (item.name && item.name.includes('Velocity')) {
-                            // Memetakan 'Velocity' dari data MQTT ke kolom 'velocity' di skema DB Anda.
-                            // Sesuaikan ini jika 'Velocity' seharusnya tidak masuk ke 'velocity'.
                             payloadForDb.velocity = parseFloat(item.data);
                         }
                     });
