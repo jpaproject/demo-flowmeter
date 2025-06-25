@@ -33,6 +33,13 @@
          </div>
          <!--end startbarApplications-->
      </li>
+     <li class="nav-item">
+         <a class="nav-link" href="{{ route('totalizer-prices.create') }}">
+            <i class="fas fa-project-diagram menu-icon"></i>
+             <span>Harga Per M3</span>
+         </a>
+         <!--end startbarDashboards-->
+     </li>
      <!--end nav-item-->
      <li class="nav-item">
          <a class="nav-link" href="{{ route('areas.index') }}">

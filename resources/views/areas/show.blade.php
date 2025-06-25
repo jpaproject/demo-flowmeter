@@ -57,7 +57,7 @@
             if (deviceKey && realtimeData && realtimeData.length > 0) {
                 // Iterasi setiap item data yang diterima untuk device ini
                 realtimeData.forEach(item => {
-                    if (item.name.includes('Flowmeter')) {
+                    if (item.name.includes('Flowrate')) {
                         const flowrateElement = document.getElementById(`flowrate_${deviceKey}`);
                         if (flowrateElement) {
                             flowrateElement.querySelector('strong').textContent = `${parseFloat(item.data).toFixed(2)} L/min`;

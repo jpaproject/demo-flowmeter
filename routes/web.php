@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AreaController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\TotalizerPriceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +47,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('areas', AreaController::class);
     Route::resource('devices', DeviceController::class);
+    Route::resource('totalizer-prices', TotalizerPriceController::class)->only(['create', 'store', 'edit', 'update', 'destroy']);
 
     
 });

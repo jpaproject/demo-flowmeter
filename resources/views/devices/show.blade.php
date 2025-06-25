@@ -65,21 +65,30 @@
         </div>
     </div>
 </div>
-
-
-{{-- <div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="card shadow">
-            <div class="card-body py-4">
-                <div id="trendingChartContainer">
-                    <canvas id="trendingChart"></canvas>
-                </div>
+<div class="row mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow rounded">
+            <div class="card-body text-center py-4">
+                <h5 class="card-title text-muted mb-3">Pengeluaran Hari Ini</h5>
+                <h4 class="text-primary mb-0">
+                    Rp {{ number_format($billingToday, 0, ',', '.') }}
+                </h4>
+                <small class="text-muted">Berdasarkan Totalizer</small>
             </div>
         </div>
     </div>
-</div> --}}
-
-
+    <div class="col-lg-6">
+        <div class="card shadow rounded">
+            <div class="card-body text-center py-4">
+                <h5 class="card-title text-muted mb-3">Totalizer Hari Ini</h5>
+                <h4 class="text-success mb-0">
+                    {{ number_format($totalizerToday, 2) }} m³
+                </h4>
+                <small class="text-muted">Total penggunaan air</small>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-lg-12">
         <div class="card shadow">
@@ -265,7 +274,7 @@
 
                 realtimeData.forEach(item => {
                     // Update nilai real-time di UI
-                    if (item.name.includes('Flowmeter')) {
+                    if (item.name.includes('Flowrate')) {
                         const flowmeterElement = document.getElementById(`realtime_flowmeter_${deviceKey}`);
                         if (flowmeterElement) {
                             currentFlowmeter = parseFloat(item.data).toFixed(2);

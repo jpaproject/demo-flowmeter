@@ -12,15 +12,15 @@ const HOST = process.env.WEBSOCKET_URL || "localhost";
 const PORT = process.env.WEBSOCKET_PORT || 3030;
 // get data from database
 
-app.use(cors());
-app.all("*", function (req, res, next) {
-    let origin = req.headers.origin;
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    next();
-});
+// app.use(cors());
+// app.all("/*", function (req, res, next) {
+//     let origin = req.headers.origin;
+//     res.header(
+//         "Access-Control-Allow-Headers",
+//         "Origin, X-Requested-With, Content-Type, Accept"
+//     );
+//     next();
+// });
 
 
 

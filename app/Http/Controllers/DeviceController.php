@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Area; // Import the Area model
 use App\Models\Device; // Import the Device model
 use App\Models\HistoryLog;
+use App\Models\TotalizerPrice;
 use Carbon\Carbon; // Import Carbon for date handling
 
 class DeviceController extends Controller
@@ -67,7 +68,25 @@ class DeviceController extends Controller
                           ->whereBetween('created_at', [$startOfDay, $endOfDay])
                           ->orderBy('created_at', 'asc') // Sort ascending for chart
                           ->get();
-        return view('devices.show', compact('device', 'logs', 'trendingLogs')); // Return a view with the device data
+        $totalizerPrice =  TotalizerPrice::first(); // Fetch the first price record
+
+
+         // Default value if no data
+        $totalizerToday = 0;
+        $billingToday = 0;
+
+        if ($logs->count() > 1) {
+            $totalizerAwal = $logs->last()->totalizer;  // log paling awal hari ini
+            $totalizerAkhir = $logs->first()->totalizer; // log paling akhir (terbaru)
+            $totalizerToday = $totalizerAkhir - $totalizerAwal;
+
+            // Jika ada record harga
+            if ($totalizerPrice && $totalizerPrice->price) {
+                $billingToday = $totalizerToday * $totalizerPrice->price;
+            }
+        }
+
+        return view('devices.show', compact('device', 'logs', 'trendingLogs', 'totalizerToday', 'billingToday')); // Return a view with the device data
     }
 
     /**

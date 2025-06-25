@@ -6,6 +6,11 @@ const axios = require('axios'); // Import axios for HTTP requests
 // Initialize a variable to store fetched devices. This array will hold the device configurations.
 let devices = [];
 
+// A Map to store the latest processed data for each device,
+// which will be saved to the database at intervals.
+// The key will be the deviceNameFromApi, and the value will be the payloadForDb.
+const dataBuffer = new Map();
+
 // Socket.IO client configuration for connecting to your WebSocket server.
 const socket = io(process.env.WEBSOCKET_URL || 'http://localhost:3030', {
     transports: ['websocket'], // Force WebSocket transport
@@ -38,6 +43,82 @@ async function getDevices() {
         console.error('Error fetching device data:', error.message);
     }
 }
+
+/**
+ * Saves all currently buffered data to the database via API.
+ * This function is called periodically and on application shutdown.
+ */
+async function saveBufferedDataToDb() {
+    if (dataBuffer.size === 0) {
+        console.log('No data in buffer to save to database.');
+        return;
+    }
+
+    console.log(`Saving ${dataBuffer.size} buffered data entries to database...`);
+    const promises = [];
+    for (const [deviceNameFromApi, payloadForDb] of dataBuffer.entries()) {
+        promises.push(
+            axios.post(`${process.env.API_URL}/api/history-logs`, payloadForDb)
+                .then(dbResponse => {
+                    console.log(`Successfully sent history log for key "${deviceNameFromApi}":`, payloadForDb);
+                    console.log('Database API response:', dbResponse.data);
+                })
+                .catch(dbError => {
+                    console.error(`Error sending history log for key "${deviceNameFromApi}":`, dbError.message);
+                    if (dbError.response) {
+                        console.error('DB API Error Response Data:', dbError.response.data);
+                        console.error('DB API Error Response Status:', dbError.response.status);
+                        console.error('DB API Error Response Headers:', dbError.response.headers);
+                    }
+                })
+        );
+    }
+
+    // Wait for all database save operations to complete
+    await Promise.allSettled(promises);
+    console.log('All buffered data saving attempts completed.');
+    // Clear the buffer after attempting to save all data
+    dataBuffer.clear();
+}
+
+// --- Logic for timed database saving ---
+let saveIntervalId; // Store the interval ID to clear it later
+
+function initializeTimedSave() {
+    const intervalMs = 5 * 60 * 1000; // 5 minutes in milliseconds
+    const now = new Date();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const milliseconds = now.getMilliseconds();
+
+    // Calculate milliseconds until the next 5-minute mark
+    // (e.g., 05:00, 10:00, 15:00, etc.)
+    const minutesIntoCurrentFiveMinuteBlock = minutes % 5;
+    const totalMsIntoCurrentBlock = minutesIntoCurrentFiveMinuteBlock * 60 * 1000 + seconds * 1000 + milliseconds;
+
+    // Calculate initial delay
+    let initialDelay = intervalMs - totalMsIntoCurrentBlock;
+
+    // If we are exactly at a 5-minute mark (e.g., 12:35:00.000) or just past it,
+    // set the delay for the next 5-minute mark.
+    if (initialDelay <= 0) {
+        initialDelay += intervalMs;
+    }
+
+    console.log(`Initial database save will occur in ${initialDelay / 1000} seconds, at the next 5-minute mark.`);
+
+    // Set a timeout for the first execution
+    setTimeout(() => {
+        saveBufferedDataToDb();
+        // After the first execution, set up the recurring interval
+        saveIntervalId = setInterval(saveBufferedDataToDb, intervalMs);
+        console.log(`Recurring database save interval set to ${intervalMs / 1000 / 60} minutes.`);
+    }, initialDelay);
+}
+
+// Call this function to start the timed save process
+initializeTimedSave();
+
 
 // --- MQTT Client Event Handlers ---
 
@@ -90,7 +171,7 @@ client.on('message', async (topic, message) => {
                 const deviceDisplayName = device.display_name;
 
                 // Filter the MQTT data array to find items that match this device.
-                // A match occurs if the MQTT item's 'name' property includes the device's API 'name'.
+                // A match occurs if the MQTT item's 'server_name' property matches the device's API 'name'.
                 const filteredMqttDataForDevice = mqttDataArray.filter(mqttItem =>
                     mqttItem.server_name === deviceNameFromApi
                 );
@@ -101,16 +182,17 @@ client.on('message', async (topic, message) => {
                     console.log(`Matched data for device API Name: "${deviceNameFromApi}" (Display Name: "${deviceDisplayName}"):`, filteredMqttDataForDevice);
 
                     // Prepare the payload for insertion into the 'history_logs' database.
+                    // This payload will be buffered.
                     let payloadForDb = {
                         key: deviceNameFromApi, // Populate 'key' with the 'name' from get-devices API
                         flowmeter: null,
                         totalizer: null,
-                        velocity: null      // Kolom 'velocity' digunakan kembali
+                        velocity: null       // Kolom 'velocity' digunakan kembali
                     };
 
                     // Populate the payload from the filtered MQTT data.
                     filteredMqttDataForDevice.forEach(item => {
-                        if (item.name && item.name.includes('Flowmeter')) {
+                        if (item.name && item.name.includes('Flowrate')) {
                             payloadForDb.flowmeter = parseFloat(item.data);
                         } else if (item.name && item.name.includes('Totalizer')) {
                             payloadForDb.totalizer = parseFloat(item.data);
@@ -118,23 +200,13 @@ client.on('message', async (topic, message) => {
                             payloadForDb.velocity = parseFloat(item.data);
                         }
                     });
+                    console.log('Constructed payloadForDb:', payloadForDb);
 
-                    // --- Send data to your database via an API endpoint ---
-                    try {
-                        const dbResponse = await axios.post(`${process.env.API_URL}/api/history-logs`, payloadForDb);
-                        console.log(`Successfully sent history log for key "${deviceNameFromApi}":`, payloadForDb);
-                        console.log('Database API response:', dbResponse.data);
-                    } catch (dbError) {
-                        console.error(`Error sending history log for key "${deviceNameFromApi}":`, dbError.message);
-                        // Log more details if the API request failed
-                        if (dbError.response) {
-                            console.error('DB API Error Response Data:', dbError.response.data);
-                            console.error('DB API Error Response Status:', dbError.response.status);
-                            console.error('DB API Error Response Headers:', dbError.response.headers);
-                        }
-                    }
+                    // Add or update the latest payload for this device in the buffer.
+                    dataBuffer.set(deviceNameFromApi, payloadForDb);
+                    console.log(`Buffered latest data for key "${deviceNameFromApi}". Current buffer size: ${dataBuffer.size}`);
 
-                    // Emit filtered data via WebSocket for real-time frontend updates.
+                    // Emit filtered data via WebSocket for real-time frontend updates immediately.
                     socket.emit('realtime', {
                         key: deviceNameFromApi,      // Send the device 'name' as key
                         deviceName: deviceDisplayName, // Send display name for better UI presentation
@@ -176,17 +248,40 @@ client.on('error', (err) => {
 
 // --- Application Shutdown Handling ---
 
-// Event handler for process exit (e.g., Ctrl+C).
-process.on('exit', () => {
-    console.log('Closing connections...');
+// Graceful shutdown on SIGINT (Ctrl+C)
+process.on('SIGINT', async () => {
+    console.log('\nReceived SIGINT. Initiating graceful shutdown...');
+    // Clear the interval to prevent new saves
+    if (saveIntervalId) {
+        clearInterval(saveIntervalId);
+    }
+
+    // Attempt to save any remaining buffered data before exiting
+    if (dataBuffer.size > 0) {
+        console.log('Flushing remaining buffered data to database...');
+        await saveBufferedDataToDb(); // Await the flush operation
+    }
+
     // Ensure the MQTT client disconnects cleanly.
     if (client && client.connected) {
-        client.end();
+        console.log('Disconnecting from MQTT broker...');
+        client.end(() => {
+            console.log('MQTT client disconnected.');
+        });
     }
     // Disconnect the Socket.IO client if it's still connected.
     if (socket && socket.connected) {
+        console.log('Disconnecting Socket.IO client...');
         socket.disconnect();
     }
-    // (Optional) If you have a database connection elsewhere in this process, ensure it's closed here.
-    console.log('Database connection (if any) closed.');
+
+    console.log('Shutdown complete. Exiting process.');
+    process.exit(0); // Exit cleanly
+});
+
+// General process exit handler (less graceful for unexpected exits)
+process.on('exit', (code) => {
+    console.log(`Process exited with code: ${code}`);
+    // This handler runs after other handlers and usually after event loop is empty.
+    // Buffered data flush should ideally happen in SIGINT/SIGTERM handlers.
 });
