@@ -34,8 +34,15 @@
          <!--end startbarApplications-->
      </li>
      <li class="nav-item">
+         <a class="nav-link" href="{{ route('report.totalizer') }}">
+            <i class="fas fa-file-medical-alt menu-icon"></i>
+             <span>Report Totalizer</span>
+         </a>
+         <!--end startbarDashboards-->
+     </li>
+     <li class="nav-item">
          <a class="nav-link" href="{{ route('totalizer-prices.create') }}">
-            <i class="fas fa-project-diagram menu-icon"></i>
+            <i class="fas fa-money-bill-wave menu-icon"></i>
              <span>Harga Per M3</span>
          </a>
          <!--end startbarDashboards-->

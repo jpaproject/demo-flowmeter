@@ -92,7 +92,10 @@
 <div class="row">
     <div class="col-lg-12">
         <div class="card shadow">
-            <div class="card-body py-4">
+            <div class="card-header">
+                <h4>Sensor Logs</h4>
+            </div>
+            <div class="card-body">
                 <div class="table-responsive">
                     <table class="table datatable" id="datatable_1">
                         <thead class="table-light">

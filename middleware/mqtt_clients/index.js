@@ -85,19 +85,17 @@ async function saveBufferedDataToDb() {
 let saveIntervalId; // Store the interval ID to clear it later
 
 function initializeTimedSave() {
-    const intervalMs = 5 * 60 * 1000; // 5 minutes in milliseconds
+    const intervalMs = 60 * 60 * 1000; // 5 minutes in milliseconds
     const now = new Date();
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
     const milliseconds = now.getMilliseconds();
 
-    // Calculate milliseconds until the next 5-minute mark
     // (e.g., 05:00, 10:00, 15:00, etc.)
-    const minutesIntoCurrentFiveMinuteBlock = minutes % 5;
-    const totalMsIntoCurrentBlock = minutesIntoCurrentFiveMinuteBlock * 60 * 1000 + seconds * 1000 + milliseconds;
+    const totalMsIntoCurrentHour = minutes * 60 * 1000 + seconds * 1000 + milliseconds;
 
-    // Calculate initial delay
-    let initialDelay = intervalMs - totalMsIntoCurrentBlock;
+    // Hitung penundaan awal
+    let initialDelay = intervalMs - totalMsIntoCurrentHour;
 
     // If we are exactly at a 5-minute mark (e.g., 12:35:00.000) or just past it,
     // set the delay for the next 5-minute mark.
