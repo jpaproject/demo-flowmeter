@@ -85,34 +85,27 @@ async function saveBufferedDataToDb() {
 let saveIntervalId; // Store the interval ID to clear it later
 
 function initializeTimedSave() {
-    const intervalMs = 60 * 60 * 1000; // 5 minutes in milliseconds
+    const intervalMs = 60 * 1000; // 1 menit
     const now = new Date();
-    const minutes = now.getMinutes();
     const seconds = now.getSeconds();
     const milliseconds = now.getMilliseconds();
 
-    // (e.g., 05:00, 10:00, 15:00, etc.)
-    const totalMsIntoCurrentHour = minutes * 60 * 1000 + seconds * 1000 + milliseconds;
+    const totalMsIntoCurrentMinute = seconds * 1000 + milliseconds;
+    let initialDelay = intervalMs - totalMsIntoCurrentMinute;
 
-    // Hitung penundaan awal
-    let initialDelay = intervalMs - totalMsIntoCurrentHour;
-
-    // If we are exactly at a 5-minute mark (e.g., 12:35:00.000) or just past it,
-    // set the delay for the next 5-minute mark.
     if (initialDelay <= 0) {
         initialDelay += intervalMs;
     }
 
-    console.log(`Initial database save will occur in ${initialDelay / 1000} seconds, at the next 5-minute mark.`);
+    console.log(`Initial database save will occur in ${initialDelay / 1000} seconds, at the next 1-minute mark.`);
 
-    // Set a timeout for the first execution
     setTimeout(() => {
         saveBufferedDataToDb();
-        // After the first execution, set up the recurring interval
         saveIntervalId = setInterval(saveBufferedDataToDb, intervalMs);
-        console.log(`Recurring database save interval set to ${intervalMs / 1000 / 60} minutes.`);
+        console.log(`Recurring database save interval set to ${intervalMs / 1000} seconds.`);
     }, initialDelay);
 }
+
 
 // Call this function to start the timed save process
 initializeTimedSave();

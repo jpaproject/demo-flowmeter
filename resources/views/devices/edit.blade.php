@@ -8,13 +8,13 @@
                 <div class="row align-items-center">
                     <div class="col">
                         <h4 class="card-title">Edit Device</h4>
-                    </div><!--end col-->
-                </div><!--end row-->
-            </div><!--end card-header-->
+                    </div>
+                </div>
+            </div>
             <div class="card-body pt-0">
                 <form id="form-validation-2" class="form" action="{{ route('devices.update', $device->id) }}" method="POST">
                     @csrf
-                    @method('PUT') {{-- This line is crucial for Laravel to recognize it as an update request --}}
+                    @method('PUT')
 
                     <div class="mb-2">
                         <label for="display_name" class="form-label">Display Name</label>
@@ -23,6 +23,7 @@
                             <div class="text-danger">{{ $message }}</div>
                         @enderror
                     </div>
+
                     <div class="mb-2">
                         <label for="name" class="form-label">Key</label>
                         <input class="form-control" type="text" id="name" name="name" value="{{ old('name', $device->name) }}" placeholder="Enter Name">
@@ -47,7 +48,23 @@
                     </div>
 
                     <div class="mb-2">
-                        <label for="description">Description</label>
+                        <label for="nama_pelanggan" class="form-label">Nama Pelanggan</label>
+                        <input class="form-control" type="text" id="nama_pelanggan" name="nama_pelanggan" value="{{ old('nama_pelanggan', $device->nama_pelanggan) }}" placeholder="Masukkan Nama Pelanggan">
+                        @error('nama_pelanggan')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="nomor_pelanggan" class="form-label">Nomor Pelanggan</label>
+                        <input class="form-control" type="text" id="nomor_pelanggan" name="nomor_pelanggan" value="{{ old('nomor_pelanggan', $device->nomor_pelanggan) }}" placeholder="Masukkan Nomor Pelanggan">
+                        @error('nomor_pelanggan')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="description" class="form-label">Description</label>
                         <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter Description">{{ old('description', $device->description) }}</textarea>
                         @error('description')
                             <div class="text-danger">{{ $message }}</div>
@@ -56,9 +73,9 @@
 
                     <button type="submit" class="btn btn-primary">Update</button>
                     <a href="{{ route('devices.index') }}" class="btn btn-secondary">Cancel</a>
-                </form><!--end form-->
-            </div><!--end card-body-->
-        </div><!--end card-->
-    </div> <!--end col-->
-</div><!--end row-->
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection

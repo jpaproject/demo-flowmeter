@@ -9,6 +9,7 @@ use App\Http\Controllers\AreaController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\TotalizerPriceController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\HistoryLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,10 +48,9 @@ Route::middleware(['auth'])->group(function () {
     });
     
     Route::get('report-totalizer', [ReportController::class, 'reportTotalizer'])->name('report.totalizer');
-Route::get('/report/totalizer/pdf', [ReportController::class, 'reportTotalizerPdf'])->name('report.totalizer.pdf');
+    Route::get('/report/totalizer/pdf', [ReportController::class, 'reportTotalizerPdf'])->name('report.totalizer.pdf');
     Route::resource('areas', AreaController::class);
     Route::resource('devices', DeviceController::class);
     Route::resource('totalizer-prices', TotalizerPriceController::class)->only(['create', 'store', 'edit', 'update', 'destroy']);
-
-    
+    Route::resource('history-logs', HistoryLogController::class);
 });

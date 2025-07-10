@@ -21,4 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/get-devices', [DeviceController::class, 'getDevices'])->name('api.devices.index');
-Route::post('/history-logs', [HistoryLogController::class, 'store']);
+Route::post('/history-logs', [HistoryLogController::class, 'storeApi']);

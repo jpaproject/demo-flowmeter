@@ -7,20 +7,23 @@
                 <div class="row align-items-center">
                     <div class="col">                      
                         <h4 class="card-title">Add new device</h4>                      
-                    </div><!--end col-->
-                </div>  <!--end row-->                                  
-            </div><!--end card-header-->
+                    </div>
+                </div>                                
+            </div>
             <div class="card-body pt-0">
                 <form id="form-validation-2" class="form" action="{{ route('devices.store') }}" method="POST">
                     @csrf
+
                     <div class="mb-2">
                         <label for="display_name" class="form-label">Display Name</label>
                         <input class="form-control" type="text" id="display_name" name="display_name" placeholder="Enter Display Name">
                     </div>
+
                     <div class="mb-2">
                         <label for="name" class="form-label">Key</label>
                         <input class="form-control" type="text" id="name" name="name" placeholder="Enter Name">
                     </div>
+
                     <div class="mb-2">
                         <label for="area_id" class="form-label">Area</label>
                         <select class="form-select" id="area_id" name="area_id">
@@ -30,14 +33,26 @@
                             @endforeach
                         </select>
                     </div>
+
                     <div class="mb-2">
-                        <label for="description">Description</label>
+                        <label for="nama_pelanggan" class="form-label">Nama Pelanggan</label>
+                        <input class="form-control" type="text" id="nama_pelanggan" name="nama_pelanggan" placeholder="Masukkan Nama Pelanggan">
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="nomor_pelanggan" class="form-label">Nomor Pelanggan</label>
+                        <input class="form-control" type="text" id="nomor_pelanggan" name="nomor_pelanggan" placeholder="Masukkan Nomor Pelanggan">
+                    </div>
+
+                    <div class="mb-2">
+                        <label for="description" class="form-label">Description</label>
                         <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter Description"></textarea>
                     </div>
+
                     <button type="submit" class="btn btn-primary">Create</button>
-                </form><!--end form-->            
-            </div><!--end card-body--> 
-        </div><!--end card--> 
-    </div> <!--end col-->                                                                                
-</div><!--end row-->
+                </form>           
+            </div>
+        </div>
+    </div>                                                                                 
+</div>
 @endsection

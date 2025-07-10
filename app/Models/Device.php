@@ -14,6 +14,8 @@ class Device extends Model
         'area_id',
         'description',
         'display_name',
+        'nama_pelanggan',
+        'nomor_pelanggan'
     ];
 
     public function area()

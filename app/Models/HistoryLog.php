@@ -15,6 +15,8 @@ class HistoryLog extends Model
         'totalizer',
         'velocity',
         'key',
+        'created_at',
+        'updated_at'
     ];
 
     // Kolom-kolom yang harus dikonversi ke tipe data tertentu (opsional)
@@ -23,4 +25,6 @@ class HistoryLog extends Model
         'totalizer' => 'float',
         'temperature' => 'float',
     ];
+
+    public $timestamps = false;
 }

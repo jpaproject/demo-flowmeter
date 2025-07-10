@@ -28,11 +28,11 @@
                         </div>
 
                         {{-- Cetak PDF --}}
-                        <div class="col-lg-3 col-md-6 mb-2 d-none" id="print_pdf_column">
+                        <div class="col-lg-3 col-md-6 mb-2">
                             <div class="form-check mt-4">
                                 <input class="form-check-input" type="checkbox" name="print_pdf" id="print_pdf" value="1" {{ request('print_pdf') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="print_pdf">
-                                    Cetak Tagihan Bulanan
+                                    Cetak sebagai PDF
                                 </label>
                             </div>
                         </div>
@@ -52,61 +52,26 @@
                 </form>
 
                 {{-- Total --}}
-                <div class="row mt-4 mb-3">
-                    <div class="col-md-6">
-                        <div class="card border-left-primary shadow h-100 py-2">
-                            <div class="card-body d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                        Total {{ $periode == 'harian' ? 'Penggunaan Totalizer' : 'Totalizer Bulanan' }}
-                                    </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                        {{ number_format($total, 3) }} m³
-                                    </div>
-                                </div>
-                                <div>
-                                    <i class="fas fa-tachometer-alt fa-2x text-primary"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <div class="card border-left-danger shadow h-100 py-2">
-                            <div class="card-body d-flex justify-content-between align-items-center">
-                                <div>
-                                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                        Total Tagihan
-                                    </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                        Rp. {{ number_format($total * $price, 0, ',', '.') }}
-                                    </div>
-                                </div>
-                                <div>
-                                    <i class="fas fa-money-bill-wave fa-2x text-danger"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="mt-3 mb-3">
+                    <h5>
+                        Total {{ $periode == 'harian' ? 'Penggunaan Totalizer' : 'Totalizer Bulanan' }}:
+                        <span class="text-primary">{{ number_format($total, 3) }} m³</span>
+                    </h5>
                 </div>
-
 
                 {{-- Table --}}
                 <div class="table-responsive">
-                    <table class="table datatable" id="datatable">
+                    <table class="table datatable" id="datatable_1">
                         <thead class="table-light">
                             <tr>
                                 <th>No</th>
                                 <th>Tanggal</th>
                                 @if ($periode == 'harian')
                                     <th>Jam</th>
-                                    <th>Start (m³)</th>
-                                    <th>End (m³)</th>
-                                    <th>Total Konsumsi (m³)</th>
+                                    <th>Totalizer (m3)</th>
+                                    <th>Konsumsi</th>
                                 @else
-                                    <th>Start (m³)</th>
-                                    <th>End (m³)</th>
-                                    <th>Total Konsumsi (m³)</th>
+                                    <th>Totalizer (m3)</th>
                                 @endif
                             </tr>
                         </thead>
@@ -117,13 +82,10 @@
                                     <td>{{ $log['tanggal'] }}</td>
                                     @if ($periode == 'harian')
                                         <td>{{ $log['jam'] }}</td>
-                                        <td>{{ $log['start'] }}</td>
-                                        <td>{{ $log['end'] }}</td>
-                                        <td>{{ $log['konsumsi'] }}</td>
+                                        <td>{{ $log['totalizer'] }}</td>
+                                        <td>{{ $log['selisih'] }}</td>
                                     @else
-                                        <td>{{ $log['start'] }}</td>
-                                        <td>{{ $log['end'] }}</td>
-                                        <td>{{ $log['konsumsi'] }}</td>
+                                        <td>{{ $log['totalizer'] }}</td>
                                     @endif
                                 </tr>
                             @endforeach
@@ -137,23 +99,15 @@
 @endsection
 
 @push('js')
-{{-- <style>
-    .dataTable-pagination {
-        display: none !important;
-    }
-</style> --}}
-
 <script>
     function togglePeriodeInputs() {
         var periode = $('#periode').val();
         if (periode === 'harian') {
             $('#date_column').removeClass('d-none');
             $('#month_column').addClass('d-none');
-            $('#print_pdf_column').addClass('d-none');
         } else if (periode === 'bulanan') {
             $('#date_column').addClass('d-none');
             $('#month_column').removeClass('d-none');
-            $('#print_pdf_column').removeClass('d-none');
         }
     }
 
@@ -163,7 +117,6 @@
             togglePeriodeInputs();
         });
     });
-
 </script>
 
 <script>
