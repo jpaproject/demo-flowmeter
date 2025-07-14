@@ -26,7 +26,7 @@
 
                     <div class="mb-2">
                         <label for="totalizer" class="form-label">Totalizer (m³)</label>
-                        <input class="form-control" type="number" step="0.000001" id="totalizer" name="totalizer" placeholder="Contoh: 1244.411133" required>
+                        <input class="form-control" type="text" id="totalizer" name="totalizer" placeholder="Contoh: 1,244.411133" required>
                     </div>
 
                     {{-- Tambahkan created_at manual jika perlu --}}

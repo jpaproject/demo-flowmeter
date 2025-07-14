@@ -39,8 +39,7 @@
                     <div class="mb-2">
                         <label for="totalizer" class="form-label">Totalizer</label>
                         <input class="form-control" 
-                               type="number" 
-                               step="0.000001" 
+                               type="text" 
                                id="totalizer" 
                                name="totalizer" 
                                value="{{ $historyLog->totalizer }}" 

@@ -38,7 +38,7 @@ class HistoryLogController extends Controller
         try {
             // Validasi data dari request
             $validatedData = $request->validate([
-                'totalizer' => 'nullable|numeric',
+                'totalizer' => 'nullable',
                 'key' => 'nullable|string|max:255',
                 'tanggal' => 'required',
                 'jam' => 'required|date_format:H:i',
@@ -101,7 +101,7 @@ class HistoryLogController extends Controller
         try {
             // Validasi data dari request
             $validatedData = $request->validate([
-                'totalizer' => 'nullable|numeric',
+                'totalizer' => 'nullable',
                 'key' => 'nullable|string|max:255',
                 'tanggal' => 'required',
                 'jam' => 'required|date_format:H:i',
